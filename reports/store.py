@@ -30,6 +30,23 @@ class ReportStore:
                     report_id INTEGER NOT NULL UNIQUE REFERENCES reports(report_id)
                 )
             ''')
+            connection.execute('''
+                CREATE TABLE IF NOT EXISTS area_budget_reports (
+                    report_id INTEGER PRIMARY KEY,
+                    first_piece_id TEXT NOT NULL REFERENCES accepted_pieces(piece_id),
+                    second_piece_id TEXT NOT NULL REFERENCES accepted_pieces(piece_id),
+                    request TEXT NOT NULL,
+                    budget TEXT NOT NULL,
+                    positions TEXT NOT NULL,
+                    CHECK (first_piece_id <> second_piece_id)
+                )
+            ''')
+            connection.execute('''
+                CREATE TABLE IF NOT EXISTS area_budget_receipts (
+                    receipt_id TEXT PRIMARY KEY NOT NULL,
+                    report_id INTEGER NOT NULL UNIQUE REFERENCES area_budget_reports(report_id)
+                )
+            ''')
         return self
 
     @contextmanager

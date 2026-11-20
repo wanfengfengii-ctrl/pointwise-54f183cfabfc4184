@@ -24,7 +24,8 @@ python3 -B demo.py
 7. `publish_head(center, first_piece_id, second_piece_id, request)` 验明两个实收父件来自不同站且同域。中心按两站覆盖并集核定，完整闭矩形均被覆盖时才放行。闭接缝可拼足，空隙会阻止跨越。结果为升序归并的 `ClosedInterval` 元组，支持等端点及空元组。报告及成功回执同次提交，成功后返回 `SignedReport`。
 8. `read_report(center, report_id)` 按正整数报告号领取原请求、区间、父件及回执。`export_report(report)` 返回确定的 JSON 文本，有理数采用规范文本，孤点写成相同的两端，空集写成 `[]`。
 9. 同批勘误用新修订号走原冻结、发行和实收入口，再以选定的新件重核。白班可按两版各自的原号分别领取，结果来自已签记录。
+10. `publish_area_budget(center, first_piece_id, second_piece_id, request, budget)` 在两站关闭后按同一矩形口径签发漏扫面积预算报告。预算为非负有理数（平方毫米），计算整头矩形内未被双件覆盖并集覆盖的面积，重叠只计一次；漏扫面积不超过预算的中心全部签出。零预算与 V1 整头资格一致，轨道短于头宽签空集。`read_area_budget(center, report_id)` 按本类正整数号领取，`export_area_budget(report)` 输出白班可独立解读的 JSON：有理端点用规范有理文本，无理端点用 `{"offset","scale","radicand"}` 表示 `p+q√r`，孤点保留等值两端、空集为 `[]`，另含 `budget_unit` 为 `mm2`。两类报告各用各的表、号段和领取入口。
 
 公共类型及函数可从对应的 `intake`、`quality`、`evidence`、`analysis`、`reports` 模块导入。两个库支持上下文管理，进入时幂等初始化，退出时关闭。站端还可用 `get_batch_label`、`get_revision` 和 `get_freeze_receipt` 核查已存资料。
 
-非法口径、身份冲突、损坏封套、错站及混域抛出 `ValueError`。格式有效但未找到的修订、父件或报告抛出 `LookupError`。SQLite 提交错误按原异常传播并回滚本次定稿。轨道短于头宽以及覆盖不足均是可签发的空结果。
+非法口径、身份冲突、损坏封套、错站及混域抛出 `ValueError`（面积预算为负同样拒绝）。格式有效但未找到的修订、父件或报告抛出 `LookupError`，向面积预算入口传 V1 号（或反向）按本类未知号处理。SQLite 提交错误按原异常传播并回滚本次定稿。轨道短于头宽、覆盖不足以及预算偏小都是可签发的空结果。
